@@ -4,6 +4,11 @@ import type { Task } from "@/types/task";
 defineProps<{
   task: Task;
 }>();
+
+const emit = defineEmits<{
+  (e: "edit", task: Task): void;
+  (e: "delete", id: string): void;
+}>();
 </script>
 
 <template>
@@ -26,18 +31,18 @@ defineProps<{
       Due: {{ task.dueDate }}
     </p>
 
-    <div class="flex gap-3 mt-5">
-      <button
-        class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-      >
-        Edit
-      </button>
+<button
+  @click="emit('edit', task)"
+  class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+>
+  Edit
+</button>
 
-      <button
-        class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-      >
-        Delete
-      </button>
-    </div>
+<button
+  @click="emit('delete', task.id)"
+  class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+>
+  Delete
+</button>
   </div>
 </template>

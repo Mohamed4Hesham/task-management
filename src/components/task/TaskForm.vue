@@ -1,0 +1,139 @@
+<script setup lang="ts">
+import { ref } from "vue";
+import type { Task, TaskStatus } from "@/types/task";
+
+interface Props {
+  task?: Task | null;
+}
+
+const props = defineProps<Props>();
+
+const emit = defineEmits<{
+  (e: "submit", task: Task): void;
+  (e: "cancel"): void;
+}>();
+
+const title = ref(props.task?.title ?? "");
+const description = ref(props.task?.description ?? "");
+const status = ref<TaskStatus>(props.task?.status ?? "pending");
+const dueDate = ref(props.task?.dueDate ?? "");
+
+const errors = ref({
+  title: "",
+  dueDate: "",
+});
+
+function validate() {
+  errors.value.title = "";
+  errors.value.dueDate = "";
+
+  if (!title.value.trim()) {
+    errors.value.title = "Title is required";
+  }
+
+  if (!dueDate.value) {
+    errors.value.dueDate = "Due date is required";
+  } else {
+    const selectedDate = new Date(dueDate.value);
+    const today = new Date();
+
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate <= today) {
+      errors.value.dueDate = "Due date must be in the future";
+    }
+  }
+
+  return !errors.value.title && !errors.value.dueDate;
+}
+
+function handleSubmit() {
+  if (!validate()) return;
+
+  emit("submit", {
+    id: props.task?.id ?? crypto.randomUUID(),
+    title: title.value,
+    description: description.value,
+    status: status.value,
+    dueDate: dueDate.value
+  });
+}
+</script>
+
+<template>
+  <form @submit.prevent="handleSubmit" class="space-y-4">
+    <div>
+      <label class="block mb-1 font-medium">Title</label>
+
+      <input
+        v-model="title"
+        type="text"
+        class="w-full border rounded-lg px-3 py-2"
+      />
+
+      <p
+        v-if="errors.title"
+        class="text-red-500 text-sm mt-1"
+      >
+        {{ errors.title }}
+      </p>
+    </div>
+
+    <div>
+      <label class="block mb-1 font-medium">Description</label>
+
+      <textarea
+        v-model="description"
+        rows="4"
+        class="w-full border rounded-lg px-3 py-2"
+      />
+    </div>
+
+    <div>
+      <label class="block mb-1 font-medium">Status</label>
+
+      <select
+        v-model="status"
+        class="w-full border rounded-lg px-3 py-2"
+      >
+        <option value="pending">Pending</option>
+        <option value="in-progress">In Progress</option>
+        <option value="done">Done</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block mb-1 font-medium">Due Date</label>
+
+      <input
+        v-model="dueDate"
+        type="date"
+        class="w-full border rounded-lg px-3 py-2"
+      />
+
+      <p
+        v-if="errors.dueDate"
+        class="text-red-500 text-sm mt-1"
+      >
+        {{ errors.dueDate }}
+      </p>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-4">
+      <button
+        type="button"
+        @click="$emit('cancel')"
+        class="px-4 py-2 rounded-lg border"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="submit"
+        class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+      >
+        {{ props.task ? "Update Task" : "Add Task" }}
+      </button>
+    </div>
+  </form>
+</template>
