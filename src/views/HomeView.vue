@@ -2,82 +2,73 @@
   <div class="min-h-screen bg-gray-100 p-8">
 
     <div class="max-w-5xl mx-auto">
-        <div class="flex items-center justify-between">
-                  <h1 class="text-3xl font-bold mb-8">
-        Task Management
-      </h1>
-
-            
-  <button
-    @click="openCreateModal"
-    class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-  >
-    + Add Task
-  </button>
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold mb-1">
+            Task Management
+          </h1>
+          <h6 class="text-base mb-8">
+            Manage your tasks efficiently and stay organized.
+          </h6>
         </div>
 
-      <div
-        v-if="taskStore.loading"
-        class="text-center"
-      >
+
+        <div>
+          <Button severity="contrast" @click="openCreateModal" class="px-4 py-2 rounded-lg ">
+            + Add Task</Button>
+        </div>
+
+      </div>
+
+      <div class="flex flex-col md:flex-row gap-4 mb-6">
+        <InputText v-model="searchQuery" placeholder="Search by title..." class="flex-1" />
+
+        <Select v-model="selectedStatus" :options="statusOptions" optionLabel="label" optionValue="value"
+          class="w-56" />
+      </div>
+
+      <div v-if="taskStore.loading" class="text-center">
         Loading...
       </div>
 
-      <div
-        v-else-if="taskStore.error"
-        class="text-red-500"
-      >
+      <div v-else-if="taskStore.error" class="text-red-500">
         {{ taskStore.error }}
       </div>
 
-<div v-else class="space-y-8">
 
-  <section>
-    <h2 class="mb-4 text-xl font-semibold text-yellow-600">
-      🟡 Pending ({{ pendingTasks.length }})
-    </h2>
 
-    <TaskList
-      :tasks="pendingTasks"
-      @edit="openEditModal"
-      @delete="handleDelete"
-    />
-  </section>
+      <div v-else class="space-y-8">
 
-  <section>
-    <h2 class="mb-4 text-xl font-semibold text-blue-600">
-      🔵 In Progress ({{ inProgressTasks.length }})
-    </h2>
+        <section>
+          <h6 class="mb-4 text-md font-semibold ">
+            Pending ({{ pendingTasks.length }})
+          </h6>
 
-    <TaskList
-      :tasks="inProgressTasks"
-      @edit="openEditModal"
-      @delete="handleDelete"
-    />
-  </section>
+          <TaskList :tasks="pendingTasks" @edit="openEditModal" @delete="handleDelete" />
+        </section>
 
-  <section>
-    <h2 class="mb-4 text-xl font-semibold text-green-600">
-      🟢 Done ({{ doneTasks.length }})
-    </h2>
+        <section>
+          <h6 class="mb-4 text-md font-semibold ">
+            In Progress ({{ inProgressTasks.length }})
+          </h6>
 
-    <TaskList
-      :tasks="doneTasks"
-      @edit="openEditModal"
-      @delete="handleDelete"
-    />
-  </section>
+          <TaskList :tasks="inProgressTasks" @edit="openEditModal" @delete="handleDelete" />
+        </section>
 
-</div>
+        <section>
+
+          <h6 class="mb-4 text-md font-semibold ">
+            Done ({{ doneTasks.length }})
+          </h6>
+          <TaskList :tasks="doneTasks" @edit="openEditModal" @delete="handleDelete" />
+        </section>
+
+      </div>
     </div>
   </div>
   <TaskModal v-if="isModalOpen" :show="isModalOpen" :onClose="closeModal">
-    <TaskForm
-        :task="editingTask"
-        @submit="handleSubmit"
-        @cancel="closeModal"
-    />
-</TaskModal>
+    <TaskForm :task="editingTask" @submit="handleSubmit" @cancel="closeModal" />
+  </TaskModal>
 </template>
 
 <script setup lang="ts">
@@ -87,27 +78,49 @@ import TaskList from "@/components/task/TaskList.vue";
 import type { Task } from "@/types/task";
 import TaskModal from "@/components/task/TaskModal.vue";
 import TaskForm from "@/components/task/TaskForm.vue";
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Select from 'primevue/select';
+
+
 
 
 const taskStore = useTaskStore();
-
-onMounted(() => {
-  taskStore.fetchTasks();
-});
-
+const searchQuery = ref("");
+const selectedStatus = ref("all");
 const isModalOpen = ref(false)
 const editingTask = ref<Task | null>(null)
+const statusOptions = [
+  { label: "All", value: "all" },
+  { label: "Pending", value: "pending" },
+  { label: "In Progress", value: "in-progress" },
+  { label: "Done", value: "done" },
+];
 
-    const pendingTasks = computed(() =>
-  taskStore.tasks.filter(task => task.status === "pending")
+const filteredTasks = computed(() => {
+  return taskStore.tasks.filter(task => {
+    const matchesSearch = task.title
+      .toLowerCase()
+      .includes(searchQuery.value.toLowerCase());
+
+    const matchesStatus =
+      selectedStatus.value === "all" ||
+      task.status === selectedStatus.value;
+
+    return matchesSearch && matchesStatus;
+  });
+});
+
+const pendingTasks = computed(() =>
+  filteredTasks.value.filter(task => task.status === "pending")
 );
 
 const inProgressTasks = computed(() =>
-  taskStore.tasks.filter(task => task.status === "in-progress")
+  filteredTasks.value.filter(task => task.status === "in-progress")
 );
 
 const doneTasks = computed(() =>
-  taskStore.tasks.filter(task => task.status === "done")
+  filteredTasks.value.filter(task => task.status === "done")
 );
 
 function openCreateModal() {
@@ -135,6 +148,10 @@ function handleSubmit(task: Task) {
 function handleDelete(id: string) {
   taskStore.deleteTask(id);
 }
+
+onMounted(() => {
+  taskStore.fetchTasks();
+});
 
 
 </script>
