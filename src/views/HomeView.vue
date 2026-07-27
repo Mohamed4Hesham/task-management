@@ -27,8 +27,9 @@
           class="w-56" />
       </div>
 
-      <div v-if="taskStore.loading" class="text-center">
-        Loading...
+      <div v-if="taskStore.loading" class="flex justify-center items-center py-20">
+        <ProgressSpinner style="width: 40px; height: 40px" strokeWidth="6" animationDuration=".8s"
+          class="flex justify-center" />
       </div>
 
       <div v-else-if="taskStore.error" class="text-red-500">
@@ -81,8 +82,7 @@ import TaskForm from "@/components/task/TaskForm.vue";
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import Select from 'primevue/select';
-
-
+import ProgressSpinner from "primevue/progressspinner";
 
 
 const taskStore = useTaskStore();
