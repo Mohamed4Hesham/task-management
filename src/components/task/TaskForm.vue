@@ -49,7 +49,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import type { Task, TaskStatus } from "@/types/task";
 import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
@@ -111,6 +111,29 @@ function validate() {
   return !errors.value.title && !errors.value.dueDate;
 }
 
+watch(title, (value) => {
+  if (value.trim()) {
+    errors.value.title = "";
+  }
+});
+
+watch(dueDate, (value) => {
+  if (!value) {
+    errors.value.dueDate = "";
+    return;
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const selectedDate = new Date(value);
+  selectedDate.setHours(0, 0, 0, 0);
+
+  if (selectedDate > today) {
+    errors.value.dueDate = "";
+  }
+});
+
 function formatDate(date: Date): string {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -118,6 +141,7 @@ function formatDate(date: Date): string {
 
   return `${year}-${month}-${day}`;
 }
+
 function handleSubmit() {
   if (!validate()) return;
 
