@@ -15,12 +15,7 @@ const emit = defineEmits<{
 <template>
 
   <div class="space-y-4">
-    <TaskCard
-      v-for="task in tasks"
-      :key="task.id"
-      :task="task"
-        @edit="emit('edit', $event)"
-  @delete="emit('delete', $event)"
-    />
+    <TaskCard v-for="task in tasks" :key="task.id" :task="task" @edit="emit('edit', $event)"
+      @delete="emit('delete', $event)" />
   </div>
 </template>

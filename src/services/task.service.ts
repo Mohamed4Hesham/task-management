@@ -2,33 +2,31 @@ import type { Task } from "@/types/task";
 
 const mockTasks: Task[] = [
   {
-      id: crypto.randomUUID(),
-      title: "Finish Vue assignment",
-      description: "Complete the CRUD task manager",
-      status: "pending",
-      dueDate: "2026-07-30",
-      createdAt: ""
+    id: crypto.randomUUID(),
+    title: "Schedule Annual Health Checkup",
+    description: "Book an appointment with the family doctor for a routine checkup.",
+    status: "pending",
+    dueDate: "2026-08-03",
+    createdAt: "2026-07-25",
   },
   {
     id: crypto.randomUUID(),
-    title: "Study Pinia",
-    description: "Understand stores and actions",
+    title: "Read a New Book",
+    description: "Finish reading at least five chapters before the end of the week.",
     status: "in-progress",
-    dueDate: "2026-07-31",
-        createdAt: ""
-
+    dueDate: "2026-08-04",
+    createdAt: "2026-07-23",
   },
   {
     id: crypto.randomUUID(),
-    title: "Push project to GitHub",
-    description: "Write README and submit",
+    title: "Pay Utility Bills",
+    description: "Pay electricity, internet, and water bills before the due date.",
     status: "done",
-    dueDate: "2026-07-29",
-        createdAt: ""
-
+    dueDate: "2026-07-28",
+    createdAt: "2026-07-20",
   },
-];
 
+];
 const delay = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 

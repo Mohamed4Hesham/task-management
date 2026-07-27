@@ -111,18 +111,23 @@ function validate() {
   return !errors.value.title && !errors.value.dueDate;
 }
 
+function formatDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 function handleSubmit() {
   if (!validate()) return;
 
-  emit("submit", {
-    id: props.task?.id ?? crypto.randomUUID(),
-    title: title.value,
-    description: description.value,
-    status: status.value,
-    dueDate: dueDate.value!.toISOString().split("T")[0]!,
-  });
-
-  console.log("Submitting status:", status.value);
+emit("submit", {
+  id: props.task?.id ?? crypto.randomUUID(),
+  title: title.value,
+  description: description.value,
+  status: status.value,
+  dueDate: formatDate(dueDate.value!),
+});
 
 }
 </script>
