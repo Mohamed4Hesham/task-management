@@ -1,6 +1,87 @@
+
+<template>
+  <form @submit.prevent="handleSubmit" class="space-y-4">
+    <div>
+      <label class="block mb-1 font-medium">Title</label>
+
+      <InputText
+        v-model="title"
+        type="text"
+        class="w-full border rounded-lg px-3 py-2"
+       />
+      <p
+        v-if="errors.title"
+        class="text-red-500 text-sm mt-1"
+      >
+        {{ errors.title }}
+      </p>
+    </div>
+
+    <div>
+      <label class="block mb-1 font-medium">Description</label>
+
+      <Textarea 
+        v-model="description"
+        rows="4"
+        class="w-full border rounded-lg px-3 py-2"/>
+
+    </div>
+
+    <div>
+      <label class="block mb-1 font-medium">Status</label>
+
+      <select
+        v-model="status"
+        class="w-full border rounded-lg px-3 py-2"
+      >
+        <option value="pending">Pending</option>
+        <option value="in-progress">In Progress</option>
+        <option value="done">Done</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block mb-1 font-medium">Due Date</label>
+
+      <input
+        v-model="dueDate"
+        type="date"
+        class="w-full border rounded-lg px-3 py-2"
+      />
+
+      <p
+        v-if="errors.dueDate"
+        class="text-red-500 text-sm mt-1"
+      >
+        {{ errors.dueDate }}
+      </p>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-4">
+      <Button
+        @click="$emit('cancel')"
+        class="px-4 py-2 rounded-lg border"
+      />
+        Cancel
+
+      <Button
+        type="submit"
+        class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+      />
+        {{ props.task ? "Update Task" : "Add Task" }}
+
+    </div>
+  </form>
+</template>
+
 <script setup lang="ts">
 import { ref } from "vue";
 import type { Task, TaskStatus } from "@/types/task";
+import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
+import Button from 'primevue/button';
+
+
 
 interface Props {
   task?: Task | null;
@@ -60,80 +141,3 @@ function handleSubmit() {
 }
 </script>
 
-<template>
-  <form @submit.prevent="handleSubmit" class="space-y-4">
-    <div>
-      <label class="block mb-1 font-medium">Title</label>
-
-      <input
-        v-model="title"
-        type="text"
-        class="w-full border rounded-lg px-3 py-2"
-      />
-
-      <p
-        v-if="errors.title"
-        class="text-red-500 text-sm mt-1"
-      >
-        {{ errors.title }}
-      </p>
-    </div>
-
-    <div>
-      <label class="block mb-1 font-medium">Description</label>
-
-      <textarea
-        v-model="description"
-        rows="4"
-        class="w-full border rounded-lg px-3 py-2"
-      />
-    </div>
-
-    <div>
-      <label class="block mb-1 font-medium">Status</label>
-
-      <select
-        v-model="status"
-        class="w-full border rounded-lg px-3 py-2"
-      >
-        <option value="pending">Pending</option>
-        <option value="in-progress">In Progress</option>
-        <option value="done">Done</option>
-      </select>
-    </div>
-
-    <div>
-      <label class="block mb-1 font-medium">Due Date</label>
-
-      <input
-        v-model="dueDate"
-        type="date"
-        class="w-full border rounded-lg px-3 py-2"
-      />
-
-      <p
-        v-if="errors.dueDate"
-        class="text-red-500 text-sm mt-1"
-      >
-        {{ errors.dueDate }}
-      </p>
-    </div>
-
-    <div class="flex justify-end gap-3 pt-4">
-      <button
-        type="button"
-        @click="$emit('cancel')"
-        class="px-4 py-2 rounded-lg border"
-      >
-        Cancel
-      </button>
-
-      <button
-        type="submit"
-        class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
-      >
-        {{ props.task ? "Update Task" : "Add Task" }}
-      </button>
-    </div>
-  </form>
-</template>

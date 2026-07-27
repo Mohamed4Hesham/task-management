@@ -30,12 +30,45 @@
         {{ taskStore.error }}
       </div>
 
-      <TaskList
-        v-else
-        :tasks="taskStore.tasks"
-          @edit="openEditModal"
-  @delete="handleDelete"
-      />
+<div v-else class="space-y-8">
+
+  <section>
+    <h2 class="mb-4 text-xl font-semibold text-yellow-600">
+      🟡 Pending ({{ pendingTasks.length }})
+    </h2>
+
+    <TaskList
+      :tasks="pendingTasks"
+      @edit="openEditModal"
+      @delete="handleDelete"
+    />
+  </section>
+
+  <section>
+    <h2 class="mb-4 text-xl font-semibold text-blue-600">
+      🔵 In Progress ({{ inProgressTasks.length }})
+    </h2>
+
+    <TaskList
+      :tasks="inProgressTasks"
+      @edit="openEditModal"
+      @delete="handleDelete"
+    />
+  </section>
+
+  <section>
+    <h2 class="mb-4 text-xl font-semibold text-green-600">
+      🟢 Done ({{ doneTasks.length }})
+    </h2>
+
+    <TaskList
+      :tasks="doneTasks"
+      @edit="openEditModal"
+      @delete="handleDelete"
+    />
+  </section>
+
+</div>
     </div>
   </div>
   <TaskModal v-if="isModalOpen" :show="isModalOpen" :onClose="closeModal">
@@ -48,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useTaskStore } from "@/stores/task.store";
 import TaskList from "@/components/task/TaskList.vue";
 import type { Task } from "@/types/task";
@@ -64,6 +97,18 @@ onMounted(() => {
 
 const isModalOpen = ref(false)
 const editingTask = ref<Task | null>(null)
+
+    const pendingTasks = computed(() =>
+  taskStore.tasks.filter(task => task.status === "pending")
+);
+
+const inProgressTasks = computed(() =>
+  taskStore.tasks.filter(task => task.status === "in-progress")
+);
+
+const doneTasks = computed(() =>
+  taskStore.tasks.filter(task => task.status === "done")
+);
 
 function openCreateModal() {
   editingTask.value = null
